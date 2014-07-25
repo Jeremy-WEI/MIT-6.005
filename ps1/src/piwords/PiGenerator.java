@@ -1,0 +1,106 @@
+package piwords;
+
+public class PiGenerator {
+    private static final int PI_PRESICION = 20;
+    /**
+     * Returns precision hexadecimal digits of the fractional part of pi.
+     * Returns digits in most significant to least significant order.
+     * 
+     * If precision < 0, return null.
+     * 
+     * @param precision The number of digits after the decimal place to
+     *                  retrieve.
+     * @return precision digits of pi in hexadecimal.
+     */
+    public static int[] computePiInHex(int precision) {
+        // TODO: Implement (Problem 1.d)
+        if (precision < 0) return null;
+        int[] array = new int[precision];
+        for (int i = 1; i <= precision; i++) {
+            array[i - 1] = piDigit(i);
+        }
+        return array;
+    }
+
+    /**
+     * Computes a^b mod m
+     * 
+     * If a < 0, b < 0, or m < 0, return -1.
+     * 
+     * @param a
+     * @param b
+     * @param m
+     * @return a^b mod m
+     */
+    public static int powerMod(int a, int b, int m) {
+        // TODO: Implement (Problem 1.b)
+        if (a < 0 || b < 0 || m < 0)
+            return -1;
+        return power(a, b) % m;
+    }
+    private static int power(int a, int b) {
+        if (b == 1) return a;
+        if (b == 0) return 1;
+        else if (b % 2 == 1) return power(a, b / 2) * power(a, b / 2) * a;
+        else return power(a, b / 2) * power(a, b / 2);
+    }
+    /**
+     * Computes the nth digit of Pi in base-16.
+     * 
+     * If n < 0, return -1.
+     * 
+     * @param n The digit of Pi to retrieve in base-16.
+     * @return The nth digit of Pi in base-16.
+     */
+    public static int piDigit(int n) {
+        if (n < 0) return -1;
+        
+        n -= 1;
+        double x = 4 * piTerm(1, n) - 2 * piTerm(4, n) -
+                   piTerm(5, n) - piTerm(6, n);
+        x = x - Math.floor(x);
+        
+        return (int)(x * 16);
+    }
+    
+    private static double piTerm(int j, int n) {
+        // Calculate the left sum
+        double s = 0;
+        for (int k = 0; k <= n; ++k) {
+            int r = 8 * k + j;
+            s += powerMod(16, n-k, r) / (double) r;
+            s = s - Math.floor(s);
+        }
+        
+        // Calculate the right sum
+        double t = 0;
+        int k = n+1;
+        // Keep iterating until t converges (stops changing)
+        while (true) {
+            int r = 8 * k + j;
+            double newt = t + Math.pow(16, n-k) / r;
+            if (t == newt) {
+                break;
+            } else {
+                t = newt;
+            }
+            ++k;
+        }
+        return s+t;
+    }
+    public static void main(String[] args) {
+        System.out.print(3+".");
+        int[] num = computePiInHex(PI_PRESICION);
+        for (int i = 0; i < num.length; i++) {
+            switch (num[i]){
+                case 10: System.out.print("A"); break;
+                case 11: System.out.print("B"); break;
+                case 12: System.out.print("C"); break;
+                case 13: System.out.print("D"); break;
+                case 14: System.out.print("E"); break;
+                case 15: System.out.print("F"); break;
+                default: System.out.print(num[i]);
+            }
+        }
+    }
+}
